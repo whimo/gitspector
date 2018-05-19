@@ -156,7 +156,7 @@ $(document).ready(function() {
         $('.ui .dimmer').dimmer('show');
         
         $.ajax({
-            url: '/repo_url',
+            url: '/new_repo',
             type: 'POST',
             contentType: 'application/json',
             dataType: 'json',
@@ -164,7 +164,13 @@ $(document).ready(function() {
                 url: url
             }),
             timeout: 90000,
-        }).done(function (data){            
+        }).done(function (data){
+            if (data['status'] == 'error')
+            {
+                show_message('negative', 'Error', data['error_text']);
+                return;
+            }
+            
             $('#content_div').empty();
             show_data('');
         }).fail(function (jqXHR, status, errorThrown) {
