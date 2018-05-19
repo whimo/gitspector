@@ -31,13 +31,13 @@ def repo_url():
 @app.route('/new_repo', methods=['CUM', 'POST'])
 def new_repo():
     if not request.json or 'url' not in request.json:
-        return jsonify({'status': 'error', 'error_text': 'You must specify repo\'s .git'}), 400
+        return jsonify({'status': 'error', 'error_text': 'You must specify repo\'s .git'})
 
     repo_url = request.json['url']
     repo_name = repo_url.split('/')[-1][:-4]
     repo_name.replace('..', 'ERROR')
 
-    os.system('rm -rf {}'.format(_path_to_repo(repo_name)))
+    #os.system('rm -rf {}'.format(_path_to_repo(repo_name)))
 
     try:
         output = check_output(['git', 'clone', repo_url, _path_to_repo(repo_name)],
@@ -45,33 +45,33 @@ def new_repo():
         output = output.decode()
 
     except TimeoutExpired:
-        return jsonify({'status': 'error', 'error_text': 'Timeout expired'}), 400
+        return jsonify({'status': 'error', 'error_text': 'Timeout expired'})
 
     if 'done' in output:
-        return jsonify({'status': 'ok'}), 201
+        return jsonify({'status': 'ok'})
     elif 'not found' in output:
-        return jsonify({'status': 'error', 'error_text': 'Repository not found'}), 404
+        return jsonify({'status': 'error', 'error_text': 'Repository not found'})
 
-    return jsonify({'status': 'error', 'error_text': 'Unknown error'}), 400
+    return jsonify({'status': 'error', 'error_text': 'Unknown error'})
 
 
 @app.route('/repos/<repo_name>/contributors', methods=['GET'])
 def get_contributors(repo_name):
     if not _check_if_exists(repo_name):
-        return jsonify({'status': 'error', 'error_text': 'Repository does not exist'}), 404
+        return jsonify({'status': 'error', 'error_text': 'Repository does not exist'})
 
     return jsonify({'status': 'ok',
-                    'contributors': str(git_analysis.contributors(_path_to_repo(repo_name)))}), 200
+                    'contributors': str(git_analysis.contributors(_path_to_repo(repo_name)))})
 
 
 @app.route('/repos/<repo_name>/stats', methods=['GET'])
 def get_stats(repo_name):
     if not _check_if_exists(repo_name):
-        return jsonify({'status': 'error', 'error_text': 'Repository does not exist'}), 404
+        return jsonify({'status': 'error', 'error_text': 'Repository does not exist'})
 
     if 'username' not in request.json:
         return jsonify({'status': 'error',
-                        'error_text': 'You must specify username to collect stats'}), 400
+                        'error_text': 'You must specify username to collect stats'})
 
     try:
         from_date = datetime.strptime(request.args.get('from_date'), '%Y-%m-%d')
@@ -79,11 +79,11 @@ def get_stats(repo_name):
 
     except KeyError:
         return jsonify({'status': 'error',
-                        'error_text': 'You must specify period start and end dates'}), 400
+                        'error_text': 'You must specify period start and end dates'})
 
     except (ValueError, TypeError):
         return jsonify({'status': 'error',
-                        'error_text': 'You must specify correct start and end dates'}), 400
+                        'error_text': 'You must specify correct start and end dates'})
 
     commits_by_type = defaultdict(list)
     commits_by_risk = defaultdict(list)
