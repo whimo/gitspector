@@ -6,16 +6,25 @@ $(document).ready(function() {
         return pattern.test(str);
     }
     
+    function show_message(type, header, body)
+    {
+        const message = $('<div class="ui ' + type + ' message"><i class="close icon"></i><div class="header">' + header +'</div><p>' + body + '</p></div>').hide();
+        message.fadeIn().appendTo('#message_div');
+    }
+    
     function handleError(error) {
         switch (error){
             case 'timeout':
                 console.log('handleError: timeout');
+                show_message('negative', 'Error', 'Timed out on your request. Please check your Internet connection.');
                 break;
             case 'not-url':
                 console.log('handleError: not-url');
+                show_message('negative', 'Error', 'Please specify a valid git repository URL.');
                 break;
             default:
                 console.log('handleError: default');
+                show_message('negative', 'Error', 'Something went wrong. Please try again later.');
                 break;
         }
     }

@@ -14,6 +14,7 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.1/semantic.min.js"></script>
         
         <!-- Initialization -->
+        <script src="../static/js/message_close.js"></script>
         <script src="../static/js/get_repo.js"></script>
     </head>
     
@@ -24,11 +25,14 @@
                     <h1>Gitspector</h1>
                 </div>
             </div>
+                
+            <div id="message_div">
+            </div>
             
-            <div class="ui centered grid">
+            <div class="ui centered grid">    
                 <div class="row">
                     <div class="ui basic segment" method="post">
-                        <form id="repo_search" style="width: 100%" class="ui left icon action input">
+                        <form id="repo_search" style="width: 100%;" class="ui left icon action input">
                             <i class="search icon"></i>
                             <input placeholder="Git repository URL"/>
                             <button class="ui submit basic button">Search</button>
@@ -41,7 +45,7 @@
                             <input placeholder="Git repository directory" type="file" webkitdirectory mozdirectory/>
                             <button id="repo_upload" class="ui submit basic button">Upload</button>
                         </div>
-                    <div>
+                    </div>
                 </div>
             </div>
         </div>
