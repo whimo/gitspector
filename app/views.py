@@ -1,7 +1,7 @@
 from app import app
 from flask import render_template, request, abort, jsonify
 import os
-from subprocess import check_output, TimeoutExpired, CalledProcessError
+from subprocess import check_output, STDOUT, TimeoutExpired, CalledProcessError
 from datetime import datetime
 from collections import defaultdict
 from . import git_analysis
@@ -41,7 +41,7 @@ def new_repo():
 
     try:
         output = check_output(['git', 'clone', repo_url, _path_to_repo(repo_name)],
-                              timeout=app.config['CLONE_TIMEOUT'])
+                              timeout=app.config['CLONE_TIMEOUT'], stderr=STDOUT)
         output = output.decode()
 
     except CalledProcessError as e:
@@ -50,10 +50,10 @@ def new_repo():
     except TimeoutExpired:
         return jsonify({'status': 'error', 'error_text': 'Timed out on git pull.'})
 
-    if 'done' in output:
-        return jsonify({'status': 'ok'})
-    elif 'not found' in output:
+    if 'not found' in output:
         return jsonify({'status': 'error', 'error_text': 'Repository not found.'})
+    elif 'Cloning into' in output:
+        return jsonify({'status': 'ok'})
 
     return jsonify({'status': 'error', 'error_text': 'Something went wrong. Please try again later.'})
 
