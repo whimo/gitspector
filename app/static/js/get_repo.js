@@ -61,9 +61,15 @@ $(document).ready(function() {
             </div>
         `
         $(html).appendTo('#content_div').fadeIn();
+        
         $('.ui.calendar').calendar({
             type: 'date'
         });
+        
+        let d = new Date();
+        let strDate = d.getFullYear() + "/" + (d.getMonth()+1) + "/" + d.getDate();
+        $('.ui.calendar').calendar('set date', strDate);
+        
         $('.ui.dropdown').dropdown({
             onChange: function (value, text, $selectedItem){
                 $('#contributor_canvas').remove();
