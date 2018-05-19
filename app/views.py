@@ -2,6 +2,7 @@ from app import app
 from flask import render_template, request, abort, jsonify
 import os
 from subprocess import check_output, TimeoutExpired
+import git_analysis
 
 
 def _path_to_repo(repo_name):
@@ -50,3 +51,12 @@ def new_repo():
         return jsonify({'status': 'error', 'error_text': 'Repository not found'}), 404
 
     return jsonify({'status': 'error', 'error_text': 'Unknown error'}), 400
+
+
+@app.route('/repos/<repo_name>/contributors', methods=['GET'])
+def get_contributors(repo_name):
+    if not _check_if_exists(repo_name):
+        return jsonify({'status': 'error', 'error_text': 'Repository does not exist'}), 404
+
+    return jsonify({'status': 'ok',
+                    'contributors': str(git_analysis.contributors(_path_to_repo(repo_name)))}), 200
