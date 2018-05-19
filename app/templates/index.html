@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>Gitspector</title>
+        
+        <meta charset="UTF-8">
+        
+        <!-- JQuery CDN -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+        <!-- Semantic UI CDN -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.1/semantic.min.css"/>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.1/semantic.min.js"></script>
+        
+        <!-- Initialization -->
+        <script src="../static/js/get_repo.js"></script>
+    </head>
+    
+    <body>
+        <div class="ui container">
+            <div class="ui centered grid">
+                <div class="row">
+                    <h1>Gitspector</h1>
+                </div>
+            </div>
+            
+            <div class="ui centered grid">
+                <div class="row">
+                    <div class="ui basic segment">
+                        <div class="ui left icon action input">
+                            <i class="search icon"></i>
+                            <input placeholder="Git repository URL"/>
+                            <button id="repo_search" class="ui submit basic button">Search</button>
+                        </div>
+
+                        <div class="ui horizontal divider">OR</div>
+                        
+                        <div class="ui left icon action input">
+                            <i class="upload icon"></i>
+                            <input placeholder="Git repository directory" type="file" webkitdirectory mozdirectory/>
+                            <button id="repo_upload" class="ui submit basic button">Upload</button>
+                        </div>
+                    <div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
