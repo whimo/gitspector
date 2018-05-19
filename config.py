@@ -1,6 +1,6 @@
 import os
 
-HOST = 'localhost'
+HOST = '0.0.0.0'
 PORT = 8080
 DEBUG = True
 
