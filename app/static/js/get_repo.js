@@ -18,8 +18,29 @@ $(document).ready(function() {
         if (active_points.length > 0) {
             let clicked_index = active_points[0]['_index'];
             let label = chart.data.labels[clicked_index];
-            alert(label);
+            show_modal('New Work', {'New Work': [{hash: '080b288', desc: 'Repo contributions list'}, {hash: '624f480', desc: 'A couple of helper functions '}]});
         }
+    }
+    
+    function show_modal(key, commits_dict) {
+        let html = [`
+            <div class="ui modal">
+                <i class="close icon"></i>
+                <div class="header">
+                    Modal Title
+                </div>
+                <div class="scrolling content">
+                    <p>`, commits_dict[key].map(function (current) {return current['hash'] + '\t' + current['desc'];}).join(), `</p>
+                </div>
+                <div class="actions">
+                    <div class="ui ok button">OK</div>
+                </div>
+            </div>
+        `].join('');
+        
+        $('#modal_div').append(html);
+        $('.ui.modal').modal('show');
+        $('.ui.modal').remove();
     }
     
     function show_data(json)
