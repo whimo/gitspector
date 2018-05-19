@@ -4,6 +4,14 @@ import os
 from subprocess import check_output, TimeoutExpired
 
 
+def _path_to_repo(repo_name):
+    return os.path.join(app.config['REPOS_DIR'], repo_name)
+
+
+def _check_if_exists(repo_name):
+    return os.path.exists(_path_to_repo(repo_name))
+
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -26,10 +34,10 @@ def new_repo():
     repo_name = repo_url.split('/')[-1][:-4]
     repo_name.replace('..', 'ERROR')
 
-    os.system('rm -rf {}'.format(os.path.join(app.config['REPOS_DIR'], repo_name)))
+    os.system('rm -rf {}'.format(_path_to_repo(repo_name)))
 
     try:
-        output = check_output(['git', 'clone', repo_url, os.path.join(app.config['REPOS_DIR'], repo_name)],
+        output = check_output(['git', 'clone', repo_url, _path_to_repo(repo_name)],
                               timeout=app.config['CLONE_TIMEOUT'])
         output = output.decode()
 
