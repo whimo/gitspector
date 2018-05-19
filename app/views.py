@@ -2,7 +2,7 @@ from app import app
 from flask import render_template, request, abort, jsonify
 import os
 from subprocess import check_output, TimeoutExpired
-import git_analysis
+from . import git_analysis
 
 
 def _path_to_repo(repo_name):

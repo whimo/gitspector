@@ -18,7 +18,7 @@ $(document).ready(function() {
         if (active_points.length > 0) {
             let clicked_index = active_points[0]['_index'];
             let label = chart.data.labels[clicked_index];
-            console.log(label);
+            alert(label);
         }
     }
     
