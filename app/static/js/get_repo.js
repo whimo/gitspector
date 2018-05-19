@@ -23,6 +23,16 @@ $(document).ready(function() {
             <div class="ui grid">
                 <div class="row">
                     <div class="ui basic segment" style="width: 100%;">
+                        <div class="ui calendar">
+                            <div class="ui fluid input left icon">
+                                <i class="calendar icon"></i>
+                                <input type="text" placeholder="Date/Time">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="ui basic segment" style="width: 100%;">
                         <div class="ui fluid search selection dropdown">
                             <input name="contributor" type="hidden">
                             <i class="dropdown icon"></i>
@@ -39,6 +49,7 @@ $(document).ready(function() {
             </div>
             `
         $(html).appendTo('#content_div').fadeIn();
+        $('.ui.calendar').calendar();
         $('.ui.dropdown').dropdown({
             onChange: function (value, text, $selectedItem){
                 $('#contributor_canvas').remove();
