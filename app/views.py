@@ -48,7 +48,7 @@ def new_repo():
         output = str(e.output)
 
     except TimeoutExpired:
-        return jsonify({'status': 'error', 'error_text': 'Timed out on git pull.'})
+        return jsonify({'status': 'error', 'error_text': 'Timed out on git clone.'})
 
     if 'done' in output:
         return jsonify({'status': 'ok'})
