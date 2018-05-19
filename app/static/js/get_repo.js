@@ -36,12 +36,30 @@ $(document).ready(function() {
                     </div>
                 </div>
                 <div class="centered row">
-                    <canvas id="contributor_canvas" width="400" height="400" style="border:1px solid #000000;"></canvas>
+                    <canvas id="contributor_canvas" width="500" height="500"></canvas>
                 </div>
             </div>
             `
         $(html).appendTo('#content_div').fadeIn();
-        $('.ui.dropdown').dropdown();
+        $('.ui.dropdown').dropdown({
+            onChange: function (value, text, $selectedItem){
+                let ctx = $('#contributor_canvas')[0].getContext('2d');
+                let chart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['New Work', 'Refactoring', 'Helping others', 'Code Churn'],
+                        datasets: [{
+                            label: text,
+                            data: [41, 9, 17, 33],
+                            backgroundColor: ['rgb(255, 99, 132)', 'rgb(54, 162, 235)', 'rgb(255, 205, 86)', 'rgb(255, 0, 255)']
+                        }]
+                    },
+                    options: {
+                        responsive: false
+                    }
+                });
+            }
+        });
     }
     
     function handleError(error) {
