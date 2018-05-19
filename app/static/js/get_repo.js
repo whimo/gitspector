@@ -1,20 +1,20 @@
 $(document).ready(function() {
-    $('#repo_search').click(function() {
+    $('#repo_search').on('submit', function(ev) {
+        ev.preventDefault();
+        
         $.ajax({
             url: '/test',
             type: 'POST',
             contentType: 'application/json',
             dataType: 'json',
             data: JSON.stringify({
-                text: 'sosi'
+                url: $('#repo_search input').val()
             }),
-            success: function (response) {
-                alert(response);
-                console.log(response);
-            },
-            error: function () {
-                alert('error');
-            }
+            timeout: 1000
+        }).done(function (data){
+            console.log(data);
+        }).fail(function (jqXHR, status) {
+            console.log(status);
         });
     });
     
