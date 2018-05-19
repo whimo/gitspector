@@ -12,6 +12,16 @@ $(document).ready(function() {
         message.fadeIn().appendTo('#message_div');
     }
     
+    function pie_chart_click(chart, ev)
+    {
+        let active_points = chart.getElementsAtEvent(ev);
+        if (active_points.length > 0) {
+            let clicked_index = active_points[0]['_index'];
+            let label = chart.data.labels[clicked_index];
+            alert(label);
+        }
+    }
+    
     function show_data(json)
     {
         let html = `
@@ -82,7 +92,7 @@ $(document).ready(function() {
                 let contributor_chart = new Chart(contributor_ctx, {
                     type: 'doughnut',
                     data: {
-                        labels: ['New Work', 'Refactoring', 'Helping others', 'Code Churn'],
+                        labels: ['New Work', 'Refactoring', 'Helping Others', 'Code Churn'],
                         datasets: [{
                             label: text,
                             data: [41, 9, 17, 33],
@@ -92,6 +102,9 @@ $(document).ready(function() {
                     options: {
                         responsive: false
                     }
+                });
+                $('#contributor_canvas').click(function (ev){
+                    pie_chart_click(contributor_chart, ev);
                 });
                 
                 let contributor_risk_ctx = $('#contributor_risk_canvas')[0].getContext('2d');
@@ -108,6 +121,10 @@ $(document).ready(function() {
                     options: {
                         responsive: false
                     }
+                });
+                
+                $('#contributor_risk_canvas').click(function (ev){
+                    pie_chart_click(contributor_risk_chart, ev);
                 });
             }
         });
@@ -139,7 +156,7 @@ $(document).ready(function() {
         $('.ui .dimmer').dimmer('show');
         
         $.ajax({
-            url: '/repo_url',
+            url: '/new_repo',
             type: 'POST',
             contentType: 'application/json',
             dataType: 'json',
@@ -147,10 +164,16 @@ $(document).ready(function() {
                 url: url
             }),
             timeout: 90000,
-        }).done(function (data){            
+        }).done(function (data){
+            if (data['status'] == 'error')
+            {
+                show_message('negative', 'Error', data['error_text']);
+                return;
+            }
+            
             $('#content_div').empty();
             show_data('');
-        }).fail(function (jqXHR, status) {
+        }).fail(function (jqXHR, status, errorThrown) {
             handleError(status);
         }).always(function() {
             $('.ui .dimmer').dimmer('hide');
