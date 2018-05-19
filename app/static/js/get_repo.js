@@ -25,12 +25,11 @@ $(document).ready(function() {
     function show_modal(key, commits_dict) {
         let html = [`
             <div class="ui modal">
-                <i class="close icon"></i>
                 <div class="header">
-                    Modal Title
+                    Commits for `, key, `
                 </div>
                 <div class="scrolling content">
-                    <p>`, commits_dict[key].map(function (current) {return current['hash'] + '\t' + current['desc'];}).join(), `</p>
+                    <p style="white-space: pre;">`, commits_dict[key].map(function (current) {return current['hash'] + '\t' + current['desc'];}).join('\n'), `</p>
                 </div>
                 <div class="actions">
                     <div class="ui ok button">OK</div>
@@ -39,8 +38,12 @@ $(document).ready(function() {
         `].join('');
         
         $('#modal_div').append(html);
-        $('.ui.modal').modal('show');
-        $('.ui.modal').remove();
+        $('.ui.modal').modal({
+            onApprove: function() {
+                $('.ui.modal').remove();
+                return true;
+            }
+        }).modal('show');
     }
     
     function show_data(json)
@@ -85,6 +88,8 @@ $(document).ready(function() {
                         </div>
                     </div>
                 </div>
+                
+                <button class="ui basic button">Apply filters</button>
             </div>
             
             <div class="ui centered grid">
