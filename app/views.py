@@ -1,7 +1,7 @@
 from app import app
 from flask import render_template, request, abort, jsonify
 import os
-from subprocess import check_output, TimeoutExpired
+from subprocess import check_output, TimeoutExpired, CalledProcessError
 from datetime import datetime
 from collections import defaultdict
 from . import git_analysis
@@ -35,7 +35,7 @@ def new_repo():
 
     repo_url = request.json['url']
     repo_name = repo_url.split('/')[-1][:-4]
-    repo_name.replace('..', 'ERROR')
+    repo_name.replace('..', 'DEADBEEF')
 
     os.system('rm -rf {}'.format(_path_to_repo(repo_name)))
 
@@ -43,6 +43,9 @@ def new_repo():
         output = check_output(['git', 'clone', repo_url, _path_to_repo(repo_name)],
                               timeout=app.config['CLONE_TIMEOUT'])
         output = output.decode()
+
+    except CalledProcessError as e:
+        output = str(e.output)
 
     except TimeoutExpired:
         return jsonify({'status': 'error', 'error_text': 'Timeout expired'}), 400
