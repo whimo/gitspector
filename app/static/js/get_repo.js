@@ -82,7 +82,7 @@ $(document).ready(function() {
                 let contributor_chart = new Chart(contributor_ctx, {
                     type: 'doughnut',
                     data: {
-                        labels: ['New Work', 'Refactoring', 'Helping others', 'Code Churn'],
+                        labels: ['New Work', 'Refactoring', 'Helping Others', 'Code Churn'],
                         datasets: [{
                             label: text,
                             data: [41, 9, 17, 33],
@@ -91,6 +91,14 @@ $(document).ready(function() {
                     },
                     options: {
                         responsive: false
+                    }
+                });
+                $('#contributor_canvas').click(function (ev){
+                    let active_points = contributor_chart.getElementsAtEvent(ev);
+                    if (active_points.length > 0) {
+                        let clicked_index = active_points[0]['_index'];
+                        let label = contributor_chart.data.labels[clicked_index];
+                        console.log(label);
                     }
                 });
                 
@@ -150,7 +158,7 @@ $(document).ready(function() {
         }).done(function (data){            
             $('#content_div').empty();
             show_data('');
-        }).fail(function (jqXHR, status) {
+        }).fail(function (jqXHR, status, errorThrown) {
             handleError(status);
         }).always(function() {
             $('.ui .dimmer').dimmer('hide');
