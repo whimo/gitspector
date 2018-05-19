@@ -10,13 +10,26 @@ def get_all_dependencies(directory, language='python'):
         return literal_eval('[' + os.popen('cfood {}'.format(directory)).read().replace('\n', ',') + ']')
 
 
-def get_dependencies_dict(directory, language='python'):
+def get_forward_dependencies_dict(directory, language='python'):
     dependencies_list = get_all_dependencies(directory, language)
     dependencies_dict = defaultdict(list)
     for child, parent in dependencies_list:
         try:
             if directory in parent[0]:
                 dependencies_dict['/'.join(child)].append('/'.join(parent))
+        except TypeError:
+            pass
+
+    return dependencies_dict
+
+
+def get_backward_dependencies_dict(directory, language='python'):
+    dependencies_list = get_all_dependencies(directory, language)
+    dependencies_dict = defaultdict(list)
+    for child, parent in dependencies_list:
+        try:
+            if directory in parent[0]:
+                dependencies_dict['/'.join(parent)].append('/'.join(child))
         except TypeError:
             pass
 
