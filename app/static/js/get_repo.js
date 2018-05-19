@@ -20,28 +20,97 @@ $(document).ready(function() {
                     <h3>Contributors data</h3>
                 </div>
             </div>
-            <div class="ui grid">
-                <div class="row">
-                    <div class="ui basic segment" style="width: 100%;">
-                        <div class="ui fluid search selection dropdown">
-                            <input name="contributor" type="hidden">
-                            <i class="dropdown icon"></i>
-                            <div class="default text">Choose a contributor</div>
-                            <div class="menu">
-                                <div class="item">Qwertygid</div>
-                                <div class="item">syn</div>
-                                <div class="item">whimo</div>
+            
+            <div class="ui form row">
+                <div class="two fields">
+                    <div class="field">
+                        <div class="ui calendar">
+                            <div class="ui fluid input left icon">
+                                <i class="calendar icon"></i>
+                                <input type="text" placeholder="Start Date">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="field">
+                        <div class="ui calendar">
+                            <div class="ui fluid input left icon">
+                                <i class="calendar icon"></i>
+                                <input type="text" placeholder="End Date">
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="centered row">
-                    <canvas id="contributor_canvas" width="400" height="400" style="border:1px solid #000000;"></canvas>
+                
+                <div class="field">
+                    <div class="ui fluid search selection dropdown">
+                        <input name="contributor" type="hidden">
+                        <i class="dropdown icon"></i>
+                        <div class="default text">Choose a contributor</div>
+                        <div class="menu">
+                            <div class="item">Qwertygid</div>
+                            <div class="item">syn</div>
+                            <div class="item">whimo</div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            `
+            
+            <div class="ui centered grid">
+                <div id="canvases_div" class="row"></div>
+            </div>
+        `
         $(html).appendTo('#content_div').fadeIn();
-        $('.ui.dropdown').dropdown();
+        
+        $('.ui.calendar').calendar({
+            type: 'date'
+        });
+        
+        let d = new Date();
+        let strDate = d.getFullYear() + "/" + (d.getMonth()+1) + "/" + d.getDate();
+        $('.ui.calendar').calendar('set date', strDate);
+        
+        $('.ui.dropdown').dropdown({
+            onChange: function (value, text, $selectedItem){
+                $('#contributor_canvas').remove();
+                $('#contributor_risk_canvas').remove();
+                
+                $('#canvases_div').append('<canvas id="contributor_canvas" width="500" height="500" style="width: 470px; height: 470px;"></canvas>');
+                $('#canvases_div').append('<canvas id="contributor_risk_canvas" width="500" height="500" style="width: 470px; height: 470px;"></canvas>');
+                
+                let contributor_ctx = $('#contributor_canvas')[0].getContext('2d');
+                let contributor_chart = new Chart(contributor_ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['New Work', 'Refactoring', 'Helping others', 'Code Churn'],
+                        datasets: [{
+                            label: text,
+                            data: [41, 9, 17, 33],
+                            backgroundColor: ['rgb(0, 204, 204)', 'rgb(54, 162, 235)', 'rgb(255, 205, 86)', 'rgb(102, 204, 0)']
+                        }]
+                    },
+                    options: {
+                        responsive: false
+                    }
+                });
+                
+                let contributor_risk_ctx = $('#contributor_risk_canvas')[0].getContext('2d');
+                let contributor_risk_chart = new Chart(contributor_risk_ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['High Risk', 'Medium Risk', 'Low Risk'],
+                        datasets: [{
+                            label: text,
+                            data: [10, 20, 70],
+                            backgroundColor: ['rgb(255, 0, 0)', 'rgb(255, 102, 102)', 'rgb(255, 204, 204)']
+                        }]
+                    },
+                    options: {
+                        responsive: false
+                    }
+                });
+            }
+        });
     }
     
     function handleError(error) {
@@ -77,7 +146,7 @@ $(document).ready(function() {
             data: JSON.stringify({
                 url: url
             }),
-            timeout: 5000,
+            timeout: 90000,
         }).done(function (data){            
             $('#content_div').empty();
             show_data('');
