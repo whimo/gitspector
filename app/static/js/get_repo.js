@@ -22,11 +22,22 @@ $(document).ready(function() {
             </div>
             
             <div class="ui form row">
-                <div class="field">
-                    <div class="ui calendar">
-                        <div class="ui fluid input left icon">
-                            <i class="calendar icon"></i>
-                            <input type="text" placeholder="Date/Time">
+                <div class="two fields">
+                    <div class="field">
+                        <div class="ui calendar">
+                            <div class="ui fluid input left icon">
+                                <i class="calendar icon"></i>
+                                <input type="text" placeholder="Start Date">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="field">
+                        <div class="ui calendar">
+                            <div class="ui fluid input left icon">
+                                <i class="calendar icon"></i>
+                                <input type="text" placeholder="End Date">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -48,9 +59,11 @@ $(document).ready(function() {
             <div class="ui centered grid">
                 <div id="canvases_div" class="row"></div>
             </div>
-            `
+        `
         $(html).appendTo('#content_div').fadeIn();
-        $('.ui.calendar').calendar();
+        $('.ui.calendar').calendar({
+            type: 'date'
+        });
         $('.ui.dropdown').dropdown({
             onChange: function (value, text, $selectedItem){
                 $('#contributor_canvas').remove();
