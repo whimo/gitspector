@@ -1,7 +1,7 @@
 import os
 
 HOST = 'localhost'
-PORT = 8080
+PORT = 80
 DEBUG = True
 
 basedir = os.path.abspath(os.path.dirname(__name__))
