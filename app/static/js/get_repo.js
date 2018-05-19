@@ -146,7 +146,7 @@ $(document).ready(function() {
             data: JSON.stringify({
                 url: url
             }),
-            timeout: 5000,
+            timeout: 90000,
         }).done(function (data){            
             $('#content_div').empty();
             show_data('');
