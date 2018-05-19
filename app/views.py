@@ -5,8 +5,8 @@ from flask import render_template, request, abort, jsonify
 def index():
     return render_template('index.html')
 
-@app.route('/test', methods=['POST'])
-def test():
+@app.route('/repo_url', methods=['POST'])
+def repo_url():
     if not request.get_json():
         abort(400)
     print(request.get_json())
