@@ -15,15 +15,12 @@ $(document).ready(function() {
     function handleError(error) {
         switch (error){
             case 'timeout':
-                console.log('handleError: timeout');
                 show_message('negative', 'Error', 'Timed out on your request. Please check your Internet connection.');
                 break;
             case 'not-url':
-                console.log('handleError: not-url');
                 show_message('negative', 'Error', 'Please specify a valid git repository URL.');
                 break;
             default:
-                console.log('handleError: default');
                 show_message('negative', 'Error', 'Something went wrong. Please try again later.');
                 break;
         }
@@ -46,11 +43,16 @@ $(document).ready(function() {
             data: JSON.stringify({
                 url: url
             }),
-            timeout: 1000
+            timeout: 5000,
+            beforeSend: function (){
+                $('.ui .loader').addClass('active');
+            }
         }).done(function (data){            
-            console.log(data);
+            
         }).fail(function (jqXHR, status) {
             handleError(status);
+        }).always(function() {
+            $('.ui .loader').removeClass('active');
         });
     });
     
