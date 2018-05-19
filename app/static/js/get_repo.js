@@ -12,6 +12,38 @@ $(document).ready(function() {
         message.fadeIn().appendTo('#message_div');
     }
     
+    function show_data(json)
+    {
+        let html = `
+            <div class="ui centered grid">
+                <div class="row">
+                    <h3>Contributors data</h3>
+                </div>
+            </div>
+            <div class="ui grid">
+                <div class="row">
+                    <div class="ui basic segment" style="width: 100%;">
+                        <div class="ui fluid search selection dropdown">
+                            <input name="contributor" type="hidden">
+                            <i class="dropdown icon"></i>
+                            <div class="default text">Choose a contributor</div>
+                            <div class="menu">
+                                <div class="item">Qwertygid</div>
+                                <div class="item">syn</div>
+                                <div class="item">whimo</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="centered row">
+                    <canvas id="contributor_canvas" width="400" height="400" style="border:1px solid #000000;"></canvas>
+                </div>
+            </div>
+            `
+        $(html).appendTo('#content_div').fadeIn();
+        $('.ui.dropdown').dropdown();
+    }
+    
     function handleError(error) {
         switch (error){
             case 'timeout':
@@ -48,7 +80,7 @@ $(document).ready(function() {
             timeout: 5000,
         }).done(function (data){            
             $('#content_div').empty();
-            // Insert new data
+            show_data('');
         }).fail(function (jqXHR, status) {
             handleError(status);
         }).always(function() {
