@@ -35,6 +35,8 @@ $(document).ready(function() {
             return;
         }
         
+        $('.ui .dimmer').dimmer('show');
+        
         $.ajax({
             url: '/repo_url',
             type: 'POST',
@@ -44,15 +46,13 @@ $(document).ready(function() {
                 url: url
             }),
             timeout: 5000,
-            beforeSend: function (){
-                $('.ui .loader').addClass('active');
-            }
         }).done(function (data){            
-            
+            $('#content_div').empty();
+            // Insert new data
         }).fail(function (jqXHR, status) {
             handleError(status);
         }).always(function() {
-            $('.ui .loader').removeClass('active');
+            $('.ui .dimmer').dimmer('hide');
         });
     });
     
