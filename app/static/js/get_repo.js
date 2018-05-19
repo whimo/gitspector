@@ -35,15 +35,18 @@ $(document).ready(function() {
                         </div>
                     </div>
                 </div>
-                <div class="centered row">
-                    <canvas id="contributor_canvas" width="500" height="500" style="width: 470px; height: 470px;"></canvas>
-                    <canvas id="contributor_risk_canvas" width="500" height="500" style="width: 470px; height: 470px;"></canvas>
-                </div>
+                <div id="canvases_div" class="centered row"></div>
             </div>
             `
         $(html).appendTo('#content_div').fadeIn();
         $('.ui.dropdown').dropdown({
             onChange: function (value, text, $selectedItem){
+                $('#contributor_canvas').remove();
+                $('#contributor_risk_canvas').remove();
+                
+                $('#canvases_div').append('<canvas id="contributor_canvas" width="500" height="500" style="width: 470px; height: 470px;"></canvas>');
+                $('#canvases_div').append('<canvas id="contributor_risk_canvas" width="500" height="500" style="width: 470px; height: 470px;"></canvas>');
+                
                 let contributor_ctx = $('#contributor_canvas')[0].getContext('2d');
                 let contributor_chart = new Chart(contributor_ctx, {
                     type: 'doughnut',
