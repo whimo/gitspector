@@ -20,32 +20,33 @@ $(document).ready(function() {
                     <h3>Contributors data</h3>
                 </div>
             </div>
-            <div class="ui grid">
-                <div class="row">
-                    <div class="ui basic segment" style="width: 100%;">
-                        <div class="ui calendar">
-                            <div class="ui fluid input left icon">
-                                <i class="calendar icon"></i>
-                                <input type="text" placeholder="Date/Time">
-                            </div>
+            
+            <div class="ui form row">
+                <div class="field">
+                    <div class="ui calendar">
+                        <div class="ui fluid input left icon">
+                            <i class="calendar icon"></i>
+                            <input type="text" placeholder="Date/Time">
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="ui basic segment" style="width: 100%;">
-                        <div class="ui fluid search selection dropdown">
-                            <input name="contributor" type="hidden">
-                            <i class="dropdown icon"></i>
-                            <div class="default text">Choose a contributor</div>
-                            <div class="menu">
-                                <div class="item">Qwertygid</div>
-                                <div class="item">syn</div>
-                                <div class="item">whimo</div>
-                            </div>
+                
+                <div class="field">
+                    <div class="ui fluid search selection dropdown">
+                        <input name="contributor" type="hidden">
+                        <i class="dropdown icon"></i>
+                        <div class="default text">Choose a contributor</div>
+                        <div class="menu">
+                            <div class="item">Qwertygid</div>
+                            <div class="item">syn</div>
+                            <div class="item">whimo</div>
                         </div>
                     </div>
                 </div>
-                <div id="canvases_div" class="centered row"></div>
+            </div>
+            
+            <div class="ui centered grid">
+                <div id="canvases_div" class="row"></div>
             </div>
             `
         $(html).appendTo('#content_div').fadeIn();
