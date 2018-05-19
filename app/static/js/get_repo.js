@@ -47,7 +47,8 @@ $(document).ready(function() {
             }),
             timeout: 5000,
         }).done(function (data){            
-            
+            $('#content_div').empty();
+            // Insert new data
         }).fail(function (jqXHR, status) {
             handleError(status);
         }).always(function() {
