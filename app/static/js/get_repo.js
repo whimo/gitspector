@@ -12,6 +12,16 @@ $(document).ready(function() {
         message.fadeIn().appendTo('#message_div');
     }
     
+    function pie_chart_click(chart, ev)
+    {
+        let active_points = chart.getElementsAtEvent(ev);
+        if (active_points.length > 0) {
+            let clicked_index = active_points[0]['_index'];
+            let label = chart.data.labels[clicked_index];
+            console.log(label);
+        }
+    }
+    
     function show_data(json)
     {
         let html = `
@@ -94,12 +104,7 @@ $(document).ready(function() {
                     }
                 });
                 $('#contributor_canvas').click(function (ev){
-                    let active_points = contributor_chart.getElementsAtEvent(ev);
-                    if (active_points.length > 0) {
-                        let clicked_index = active_points[0]['_index'];
-                        let label = contributor_chart.data.labels[clicked_index];
-                        console.log(label);
-                    }
+                    pie_chart_click(contributor_chart, ev);
                 });
                 
                 let contributor_risk_ctx = $('#contributor_risk_canvas')[0].getContext('2d');
@@ -116,6 +121,10 @@ $(document).ready(function() {
                     options: {
                         responsive: false
                     }
+                });
+                
+                $('#contributor_risk_canvas').click(function (ev){
+                    pie_chart_click(contributor_risk_chart, ev);
                 });
             }
         });
