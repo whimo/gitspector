@@ -36,22 +36,39 @@ $(document).ready(function() {
                     </div>
                 </div>
                 <div class="centered row">
-                    <canvas id="contributor_canvas" width="500" height="500"></canvas>
+                    <canvas id="contributor_canvas" width="500" height="500" style="width: 470px; height: 470px;"></canvas>
+                    <canvas id="contributor_risk_canvas" width="500" height="500" style="width: 470px; height: 470px;"></canvas>
                 </div>
             </div>
             `
         $(html).appendTo('#content_div').fadeIn();
         $('.ui.dropdown').dropdown({
             onChange: function (value, text, $selectedItem){
-                let ctx = $('#contributor_canvas')[0].getContext('2d');
-                let chart = new Chart(ctx, {
+                let contributor_ctx = $('#contributor_canvas')[0].getContext('2d');
+                let contributor_chart = new Chart(contributor_ctx, {
                     type: 'doughnut',
                     data: {
                         labels: ['New Work', 'Refactoring', 'Helping others', 'Code Churn'],
                         datasets: [{
                             label: text,
                             data: [41, 9, 17, 33],
-                            backgroundColor: ['rgb(255, 99, 132)', 'rgb(54, 162, 235)', 'rgb(255, 205, 86)', 'rgb(255, 0, 255)']
+                            backgroundColor: ['rgb(0, 204, 204)', 'rgb(54, 162, 235)', 'rgb(255, 205, 86)', 'rgb(102, 204, 0)']
+                        }]
+                    },
+                    options: {
+                        responsive: false
+                    }
+                });
+                
+                let contributor_risk_ctx = $('#contributor_risk_canvas')[0].getContext('2d');
+                let contributor_risk_chart = new Chart(contributor_risk_ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['High Risk', 'Medium Risk', 'Low Risk'],
+                        datasets: [{
+                            label: text,
+                            data: [10, 20, 70],
+                            backgroundColor: ['rgb(255, 0, 0)', 'rgb(255, 102, 102)', 'rgb(255, 204, 204)']
                         }]
                     },
                     options: {
