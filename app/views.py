@@ -2,6 +2,8 @@ from app import app
 from flask import render_template, request, abort, jsonify
 import os
 from subprocess import check_output, TimeoutExpired
+from datetime import datetime
+from collections import defaultdict
 from . import git_analysis
 
 
@@ -60,3 +62,42 @@ def get_contributors(repo_name):
 
     return jsonify({'status': 'ok',
                     'contributors': str(git_analysis.contributors(_path_to_repo(repo_name)))}), 200
+
+
+@app.route('/repos/<repo_name>/stats', methods=['GET'])
+def get_stats(repo_name):
+    if not _check_if_exists(repo_name):
+        return jsonify({'status': 'error', 'error_text': 'Repository does not exist'}), 404
+
+    if 'username' not in request.json:
+        return jsonify({'status': 'error',
+                        'error_text': 'You must specify username to collect stats'}), 400
+
+    try:
+        from_date = datetime.strptime(request.args.get('from_date'), '%Y-%m-%d')
+        to_date =   datetime.strptime(request.args.get('to_date'),   '%Y-%m-%d')
+
+    except KeyError:
+        return jsonify({'status': 'error',
+                        'error_text': 'You must specify period start and end dates'}), 400
+
+    except (ValueError, TypeError):
+        return jsonify({'status': 'error',
+                        'error_text': 'You must specify correct start and end dates'}), 400
+
+    commits_by_type = defaultdict(list)
+    commits_by_risk = defaultdict(list)
+
+    commits = git_analysis.get_commits_period(from_date, to_date)
+
+    for commit in commits:
+        commit_description = git_analysis.get_description(commit)
+        commit_type = git_analysis.get_commit_type(commit)
+        commit_risk = git_analysis.get_risk(commit)
+        info = {'sha': commit, 'description': commit_description}
+
+        commits_by_type[commit_type].append(info)
+        commits_by_risk[commit_risk].append(info)
+
+    return jsonify({'status': 'ok',
+                    'commits_by_type': dict(commits_by_type), 'commits_by_risk': dict(commits_by_risk)})
