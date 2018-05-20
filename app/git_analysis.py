@@ -3,7 +3,9 @@ import re
 
 
 def show_author_of_line(file, line_off, line, prev_sha):
-    cmd = f'git blame {prev_sha}^ {file} -L{line_off + line},{line_off + line}'.split()
+    cmd = ['git', 'blame', '{}^'.format(prev_sha), '{}'.format(file),
+           '-L{},{}'.format(line_off + line, line_off + line)]
+
     try:
         output = check_output(cmd).decode('utf-8')
         r_author = r'\(([a-zA-Z0-9 ]*) ([0-9\-\ \:]*\+[0-9]{4,4}) ' + str(line + line_off) + r'\)'
@@ -16,13 +18,12 @@ def show_author_of_line(file, line_off, line, prev_sha):
 def stats_for_commit(sha1):
     print('lasalca here')
     commit = sha1
-    cmd = f'git diff {commit}^ {commit}'.split(' ')
-    d = check_output(cmd).decode('utf-8')
+    cmd = ['git', 'diff', '{}^'.format(commit), '{}'.format(commit)]
+    output = check_output(cmd).decode('utf-8')
 
     diffs = []
 
     line_a = 0
-    line_b = 0
     offset = 0
     filename = ''
     stage = 0
@@ -30,8 +31,7 @@ def stats_for_commit(sha1):
     skip_new_file_idx = 0
     skip_new_file_iter = 0
 
-    for line in d.split('\n'):
-
+    for line in output.split('\n'):
         if line.startswith(r'\ No newline at end of file'):
             continue
 
@@ -71,7 +71,6 @@ def stats_for_commit(sha1):
             r_lines = r'\@\@ [\-\+]([0-9]*),[0-9]* [\-\+]([0-9]*),[0-9]* \@\@'  # e.g. '<sha-1> (<name> <date> line)\n'
             diff_start = re.search(r_lines, line)
             line_a = int(diff_start.group(1))
-            line_b = int(diff_start.group(2))
             offset = 0
             del_off = 0
             continue
@@ -87,7 +86,8 @@ def stats_for_commit(sha1):
                 diffs.append(('+', (None, None)))
 
         elif line.startswith('-') and not line.startswith('---'):
-            diffs.append(('-', show_author_of_line(filename, offset + del_off, line_a, f'{commit}')))
+            diffs.append(('-', show_author_of_line(filename, offset + del_off,
+                                                   line_a, '{}'.format(commit))))
             del_off -= 1
 
         offset += 1
@@ -96,7 +96,9 @@ def stats_for_commit(sha1):
 
 
 def get_commits_period(from_date, to_date):
-    cmd = f'git rev-list\
-            --since="{from_date.strftime('%Y-%m-%d')}" --before="{to_date.strftime('%Y-%m-%d')}"\
-            --all --no-merges'.split(' ')
+    cmd = ['git', 'rev-list',
+           '--since="{}"'.format(from_date.strftime('%Y-%m-%d')),
+           '--before="{}"'.format(to_date.strftime('%Y-%m-%d')),
+           '--all', '--no-merges']
+
     return check_output(cmd).decode('utf-8').split()
