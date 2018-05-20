@@ -37,7 +37,7 @@ def new_repo():
     repo_name = repo_url.split('/')[-1][:-4]
     repo_name.replace('..', 'DEADBEEF')
 
-    #os.system('rm -rf {}'.format(_path_to_repo(repo_name)))
+    os.system('rm -rf {}'.format(_path_to_repo(repo_name)))
 
     try:
         output = check_output(['git', 'clone', repo_url, _path_to_repo(repo_name)],
