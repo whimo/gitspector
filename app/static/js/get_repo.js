@@ -2,6 +2,19 @@ $(document).ready(function() {
     const regex = /^(https?:\/\/)?((([a-z\d]([a-z\d-]*[a-z\d])*)\.)+[a-z]{2,}|((\d{1,3}\.){3}\d{1,3}))(\:\d+)?(\/[-a-z\d%_.~+]*)*(\?[;&a-z\d%_.~+=-]*)?(\#[-a-z\d_]*)?$/i;
     const pattern = new RegExp(regex);
     
+    function format_date(date)
+    {
+        let d = new Date(date);
+        let month = '' + (d.getMonth() + 1);
+        let day = '' + d.getDate();
+        let year = '' + d.getFullYear();
+        
+        if (month.length < 2) month = '0' + month;
+        if (day.length < 2) day = '0' + day;
+        
+        return [year, month, day].join('-');
+    }
+    
     function validURL(str) {
         return pattern.test(str);
     }
@@ -68,6 +81,9 @@ $(document).ready(function() {
             show_message('negative', 'Error', 'Please specify a valid contributor');
             return;
         }
+        
+        start_date = format_date(start_date);
+        end_date = format_date(end_date);
             
         $('#contributor_canvas').remove();
         $('#contributor_risk_canvas').remove();
