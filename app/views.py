@@ -95,8 +95,7 @@ def get_stats(repo_name):
 
     for commit in commits:
         commit_description = git_analysis.get_description(commit)
-        commit_type = git_analysis.get_commit_type(commit)
-        commit_risk = git_analysis.get_risk(commit)
+        commit_type, commit_risk = git_analysis.get_commit_info(commit)
         info = {'sha': commit, 'description': commit_description}
 
         commits_by_type[commit_type].append(info)

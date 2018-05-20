@@ -76,6 +76,7 @@ def stats_for_commit(sha1):
             continue
 
         if line.startswith('diff'):
+            files_in_commit += 1
             stage = 1
             continue
 
@@ -93,6 +94,15 @@ def stats_for_commit(sha1):
         offset += 1
 
     return diffs
+
+
+def changes_in_files_in_commit(commit):
+    cmd = 'git diff {sha}^ {sha} --stat'.format(sha=commit)
+    stats = check_output(cmd.split())
+    for line in stats.split('\n')[:-1]:
+        r_stat = r'([^\0]*) | ([0-9]+) [\-\+]*'
+        stat = re.search(r_stat, line)
+        yield (stat.group(1), stat.group(2))
 
 
 def get_commits_period(from_date, to_date):
