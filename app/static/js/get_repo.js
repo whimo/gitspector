@@ -47,7 +47,26 @@ $(document).ready(function() {
     }
     
     function redraw_contributor_canvases() {
+        let start_date = $('.ui.calendar')[0].calendar('get date');
+        let end_date = $('.ui.calendar')[1].calendar('get date');
+
         let text = $('.ui.dropdown').dropdown('get text');
+        
+        if (!start_date || start_date === '')
+        {
+            show_message('negative', 'Error', 'Please specify a valid period start date');
+            return;
+        }
+        else if (!end_date || end_date === '')
+        {
+            show_message('negative', 'Error', 'Please specify a valid period end date');
+            return;
+        }
+        else if (!text || text === '')
+        {
+            show_message('negative', 'Error', 'Please specify a valid contributor');
+            return;
+        }
             
         $('#contributor_canvas').remove();
         $('#contributor_risk_canvas').remove();
@@ -95,69 +114,84 @@ $(document).ready(function() {
         });
     }
     
-    function show_data(json)
+    function show_data(repo_name)
     {
-        let html = `
-            <div class="ui centered grid">
-                <div class="row">
-                    <h3>Contributors data</h3>
-                </div>
-            </div>
+        $('.ui .dimmer').dimmer('show');
+        
+        $.ajax({
+            url: '/repos/'+ repo_name + '/contributors',
+            type: 'GET',
+            dataType: 'json',
+            timeout: 90000,
+        }).done(function (data){
+            if (data['status'] == 'error')
+            {
+                show_message('negative', 'Error', data['error_text']);
+                return;
+            }
             
-            <div class="ui form row">
-                <div class="two fields">
-                    <div class="field">
-                        <div class="ui calendar">
-                            <div class="ui fluid input left icon">
-                                <i class="calendar icon"></i>
-                                <input type="text" placeholder="Start Date">
+            let html = `
+                <div class="ui centered grid">
+                    <div class="row">
+                        <h3>Contributors data</h3>
+                    </div>
+                </div>
+                
+                <div class="ui form row">
+                    <div class="two fields">
+                        <div class="field">
+                            <div class="ui calendar">
+                                <div class="ui fluid input left icon">
+                                    <i class="calendar icon"></i>
+                                    <input type="text" placeholder="Start Date">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="field">
+                            <div class="ui calendar">
+                                <div class="ui fluid input left icon">
+                                    <i class="calendar icon"></i>
+                                    <input type="text" placeholder="End Date">
+                                </div>
                             </div>
                         </div>
                     </div>
                     
                     <div class="field">
-                        <div class="ui calendar">
-                            <div class="ui fluid input left icon">
-                                <i class="calendar icon"></i>
-                                <input type="text" placeholder="End Date">
-                            </div>
+                        <div class="ui fluid search selection dropdown">
+                            <input name="contributor" type="hidden">
+                            <i class="dropdown icon"></i>
+                            <div class="default text">Choose a contributor</div>
+                            <div class="menu">` +
+                                data['contributors'].map(function (current) {return '<div class="item">' + current + '</div>'}).join() +
+                            `</div>
                         </div>
                     </div>
+                    
+                    <button id="apply_filters_button" class="ui basic button">Apply filters</button>
                 </div>
                 
-                <div class="field">
-                    <div class="ui fluid search selection dropdown">
-                        <input name="contributor" type="hidden">
-                        <i class="dropdown icon"></i>
-                        <div class="default text">Choose a contributor</div>
-                        <div class="menu">
-                            <div class="item">Qwertygid</div>
-                            <div class="item">syn</div>
-                            <div class="item">whimo</div>
-                        </div>
-                    </div>
+                <div class="ui centered grid">
+                    <div id="canvases_div" class="row"></div>
                 </div>
-                
-                <button id="apply_filters_button" class="ui basic button">Apply filters</button>
-            </div>
+            `
+            $(html).appendTo('#content_div').fadeIn();
             
-            <div class="ui centered grid">
-                <div id="canvases_div" class="row"></div>
-            </div>
-        `
-        $(html).appendTo('#content_div').fadeIn();
-        
-        $('.ui.calendar').calendar({
-            type: 'date'
+            let d = new Date();
+            let strDate = d.getFullYear() + "/" + (d.getMonth()+1) + "/" + d.getDate();
+            $('.ui.calendar').calendar({
+                type: 'date'
+            }).calendar('set date', strDate);
+            
+            $('.ui.dropdown').dropdown();
+            
+            $('#apply_filters_button').click(redraw_contributor_canvases);
+        }).fail(function (jqXHR, status, errorThrown) {
+            handleError(status);
+        }).always(function() {
+            $('.ui .dimmer').dimmer('hide');
         });
-        
-        let d = new Date();
-        let strDate = d.getFullYear() + "/" + (d.getMonth()+1) + "/" + d.getDate();
-        $('.ui.calendar').calendar('set date', strDate);
-        
-        $('.ui.dropdown').dropdown();
-        
-        $('#apply_filters_button').click(redraw_contributor_canvases);
     }
     
     function handleError(error) {
@@ -202,7 +236,9 @@ $(document).ready(function() {
             }
             
             $('#content_div').empty();
-            show_data('');
+            
+            let repo_name = url.split('/').slice(-1)[0].split('.')[0];
+            show_data(repo_name);
         }).fail(function (jqXHR, status, errorThrown) {
             handleError(status);
         }).always(function() {
