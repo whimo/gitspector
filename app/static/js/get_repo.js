@@ -47,8 +47,8 @@ $(document).ready(function() {
     }
     
     function redraw_contributor_canvases() {
-        let start_date = $('.ui.calendar')[0].calendar('get date');
-        let end_date = $('.ui.calendar')[1].calendar('get date');
+        let start_date = $('#start_date').calendar('get date');
+        let end_date = $('#end_date').calendar('get date');
 
         let text = $('.ui.dropdown').dropdown('get text');
         
@@ -140,7 +140,7 @@ $(document).ready(function() {
                 <div class="ui form row">
                     <div class="two fields">
                         <div class="field">
-                            <div class="ui calendar">
+                            <div id="start_date" class="ui calendar">
                                 <div class="ui fluid input left icon">
                                     <i class="calendar icon"></i>
                                     <input type="text" placeholder="Start Date">
@@ -149,7 +149,7 @@ $(document).ready(function() {
                         </div>
                         
                         <div class="field">
-                            <div class="ui calendar">
+                            <div id="end_date" class="ui calendar">
                                 <div class="ui fluid input left icon">
                                     <i class="calendar icon"></i>
                                     <input type="text" placeholder="End Date">
@@ -164,7 +164,7 @@ $(document).ready(function() {
                             <i class="dropdown icon"></i>
                             <div class="default text">Choose a contributor</div>
                             <div class="menu">` +
-                                data['contributors'].map(function (current) {return '<div class="item">' + current + '</div>'}).join() +
+                                data['contributors'].map(function (current) {return '<div class="item">' + current + '</div>'}).join('') +
                             `</div>
                         </div>
                     </div>
@@ -212,6 +212,7 @@ $(document).ready(function() {
         ev.preventDefault();
         
         let url = $('#repo_search input').val();
+        console.log(url);
         if (!validURL(url)) {
             handleError('not-url');
             return;
@@ -238,11 +239,11 @@ $(document).ready(function() {
             $('#content_div').empty();
             
             let repo_name = url.split('/').slice(-1)[0].split('.')[0];
+            $('.ui .dimmer').dimmer('hide');
             show_data(repo_name);
         }).fail(function (jqXHR, status, errorThrown) {
-            handleError(status);
-        }).always(function() {
             $('.ui .dimmer').dimmer('hide');
+            handleError(status);
         });
     });
     

@@ -28,7 +28,7 @@ def repo_url():
     return jsonify({'status': 'SUCC sees'})
 
 
-@app.route('/new_repo', methods=['CUM', 'POST'])
+@app.route('/new_repo', methods=['POST'])
 def new_repo():
     if not request.json or 'url' not in request.json:
         return jsonify({'status': 'error', 'error_text': 'You must specify .git of the repository'})
@@ -37,7 +37,7 @@ def new_repo():
     repo_name = repo_url.split('/')[-1][:-4]
     repo_name.replace('..', 'DEADBEEF')
 
-    os.system('rm -rf {}'.format(_path_to_repo(repo_name)))
+    #os.system('rm -rf {}'.format(_path_to_repo(repo_name)))
 
     try:
         output = check_output(['git', 'clone', repo_url, _path_to_repo(repo_name)],
@@ -64,8 +64,8 @@ def get_contributors(repo_name):
         return jsonify({'status': 'error', 'error_text': 'Repository does not exist.'})
 
     return jsonify({'status': 'ok',
-                    'contributors': str(git_analysis.contributors(
-                                        os.path.join(_path_to_repo(repo_name), '.git')))})
+                    'contributors': git_analysis.contributors(
+                        os.path.join(_path_to_repo(repo_name), '.git'))})
 
 
 @app.route('/repos/<repo_name>/stats', methods=['GET'])

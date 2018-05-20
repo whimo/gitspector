@@ -119,6 +119,6 @@ def contributors(directory):
 
     contributors_list = []
     for line in output.split('\n'):
-        contributors.append(' '.join(line.split()[1:]))
+        contributors_list.append(' '.join(line.split()[1:]))
 
     return contributors_list
