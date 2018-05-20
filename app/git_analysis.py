@@ -249,3 +249,14 @@ def get_counts_period(from_date, to_date):
         activity[c_type] += amount
 
     return activity
+
+
+def contributors(directory):
+    cmd = ['git', '--git-dir={}'.format(directory), 'shortlog', '-sn']
+    output = check_output(cmd).decode('utf-8')
+
+    contributors_list = []
+    for line in output.split('\n'):
+        contributors_list.append(' '.join(line.split()[1:]))
+
+    return contributors_list
