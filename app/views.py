@@ -7,8 +7,11 @@ from collections import defaultdict
 from . import git_analysis
 
 
-def _path_to_repo(repo_name):
-    return os.path.join(app.config['REPOS_DIR'], repo_name)
+def _path_to_repo(repo_name, include_git=True):
+    if include_git:
+        return os.path.join(app.config['REPOS_DIR'], repo_name, '.git')
+    else:
+        return os.path.join(app.config['REPOS_DIR'], repo_name)
 
 
 def _check_if_exists(repo_name):
@@ -72,8 +75,7 @@ def get_contributors(repo_name):
         return jsonify({'status': 'error', 'error_text': 'Repository does not exist.'})
 
     return jsonify({'status': 'ok',
-                    'contributors': git_analysis.contributors(
-                        os.path.join(_path_to_repo(repo_name), '.git'))})
+                    'contributors': git_analysis.contributors(_path_to_repo(repo_name, True))})
 
 
 @app.route('/repos/<repo_name>/stats', methods=['POST'])
@@ -100,8 +102,9 @@ def get_stats(repo_name):
     commits_by_type = defaultdict(list)
     commits_by_risk = defaultdict(list)
 
-    commits = git_analysis.get_commits_period(from_date, to_date)
-    commits_info = [git_analysis.get_commit_info(commit) for commit in commits]
+    commits = git_analysis.get_commits_period(from_date, to_date, _path_to_repo(repo_name, True))
+    commits_info = [git_analysis.get_commit_info(commit, _path_to_repo(repo_name, True))
+                    for commit in commits]
 
     commit_types, commit_risks = zip(*commits_info)
     min_risk, max_risk = min(commit_risks), max(commit_risks)
@@ -117,8 +120,7 @@ def get_stats(repo_name):
             commit_risks[i] = 'High'
 
     for i, commit in enumerate(commits):
-        commit_description = git_analysis.get_description(commit)
-        commit_type, commit_risk = git_analysis.get_commit_info(commit)
+        commit_description = git_analysis.get_description(commit, _path_to_repo(repo_name, True))
         info = {'sha': commit, 'description': commit_description}
 
         commits_by_type[commit_types[i]].append(info)
