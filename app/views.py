@@ -51,7 +51,7 @@ def new_repo():
     os.system('rm -rf {}'.format(_path_to_repo(repo_name)))
 
     try:
-        output = check_output(['git', 'clone', repo_url, _path_to_repo(repo_name)],
+        output = check_output(['git', 'clone', repo_url, _path_to_repo(repo_name, False)],
                               timeout=app.config['CLONE_TIMEOUT'], stderr=STDOUT)
         output = output.decode()
 
