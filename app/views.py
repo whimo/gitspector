@@ -116,11 +116,11 @@ def get_stats(repo_name):
         risk_proj = _translate_interval(val, min_risk, max_risk, 0, 100)
 
         if risk_proj <= 33:
-            commit_risks[i] = 'Low'
+            commit_risks[i] = 'Low Risk'
         elif risk_proj <= 67:
-            commit_risks[i] = 'Medium'
+            commit_risks[i] = 'Medium Risk'
         else:
-            commit_risks[i] = 'High'
+            commit_risks[i] = 'High Risk'
 
     for i, commit in enumerate(commits):
         commit_description = git_analysis.get_description(commit, _path_to_repo(repo_name, True))
