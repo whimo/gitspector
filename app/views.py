@@ -15,6 +15,14 @@ def _check_if_exists(repo_name):
     return os.path.exists(_path_to_repo(repo_name))
 
 
+def _translate_interval(num, min1, max1, min2, max2):
+    len1 = max1 - min1
+    len2 = max2 - min2
+
+    scaled = float(num - min1) / float(len1)
+    return min2 + (scaled * len2)
+
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -78,8 +86,8 @@ def get_stats(repo_name):
                         'error_text': 'You must specify a username to collect statistics.'})
 
     try:
-        from_date = datetime.strptime(request.args.get('from_date'), '%Y-%m-%d')
-        to_date =   datetime.strptime(request.args.get('to_date'),   '%Y-%m-%d')
+        from_date = datetime.strptime(request.json['from_date'], '%Y-%m-%d')
+        to_date =   datetime.strptime(request.json['to_date'],   '%Y-%m-%d')
 
     except KeyError:
         return jsonify({'status': 'error',
@@ -93,14 +101,28 @@ def get_stats(repo_name):
     commits_by_risk = defaultdict(list)
 
     commits = git_analysis.get_commits_period(from_date, to_date)
+    commits_info = [git_analysis.get_commit_info(commit) for commit in commits]
 
-    for commit in commits:
+    commit_types, commit_risks = zip(*commits_info)
+    min_risk, max_risk = min(commit_risks), max(commit_risks)
+
+    for i, val in enumerate(commit_risks):
+        risk_proj = _translate_interval(val, min_risk, max_risk, 0, 100)
+
+        if risk_proj <= 33:
+            commit_risks[i] = 'Low'
+        elif risk_proj <= 67:
+            commit_risks[i] = 'Medium'
+        else:
+            commit_risks[i] = 'High'
+
+    for i, commit in enumerate(commits):
         commit_description = git_analysis.get_description(commit)
         commit_type, commit_risk = git_analysis.get_commit_info(commit)
         info = {'sha': commit, 'description': commit_description}
 
-        commits_by_type[commit_type].append(info)
-        commits_by_risk[commit_risk].append(info)
+        commits_by_type[commit_types[i]].append(info)
+        commits_by_risk[commit_risks[i]].append(info)
 
     return jsonify({'status': 'ok',
                     'commits_by_type': dict(commits_by_type), 'commits_by_risk': dict(commits_by_risk)})
