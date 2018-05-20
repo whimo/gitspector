@@ -68,7 +68,7 @@ def get_contributors(repo_name):
                         os.path.join(_path_to_repo(repo_name), '.git'))})
 
 
-@app.route('/repos/<repo_name>/stats', methods=['GET'])
+@app.route('/repos/<repo_name>/stats', methods=['POST'])
 def get_stats(repo_name):
     if not _check_if_exists(repo_name):
         return jsonify({'status': 'error', 'error_text': 'Repository does not exist.'})
