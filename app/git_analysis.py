@@ -288,7 +288,7 @@ def get_commit_info(sha, gitdir):
     except:
         files = []
 
-    return c_type, files
+    return c_type, code_analysis.get_risk(gitdir[:-5], sha, files)
 
 
 def get_counts_period(from_date, to_date, gitdir):
