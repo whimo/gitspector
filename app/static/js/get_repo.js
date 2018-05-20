@@ -89,7 +89,7 @@ $(document).ready(function() {
                     </div>
                 </div>
                 
-                <button class="ui basic button">Apply filters</button>
+                <button id="apply_filters_button" class="ui basic button">Apply filters</button>
             </div>
             
             <div class="ui centered grid">
@@ -106,53 +106,55 @@ $(document).ready(function() {
         let strDate = d.getFullYear() + "/" + (d.getMonth()+1) + "/" + d.getDate();
         $('.ui.calendar').calendar('set date', strDate);
         
-        $('.ui.dropdown').dropdown({
-            onChange: function (value, text, $selectedItem){
-                $('#contributor_canvas').remove();
-                $('#contributor_risk_canvas').remove();
-                
-                $('#canvases_div').append('<canvas id="contributor_canvas" width="500" height="500" style="width: 470px; height: 470px;"></canvas>');
-                $('#canvases_div').append('<canvas id="contributor_risk_canvas" width="500" height="500" style="width: 470px; height: 470px;"></canvas>');
-                
-                let contributor_ctx = $('#contributor_canvas')[0].getContext('2d');
-                let contributor_chart = new Chart(contributor_ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['New Work', 'Refactoring', 'Helping Others', 'Code Churn'],
-                        datasets: [{
-                            label: text,
-                            data: [41, 9, 17, 33],
-                            backgroundColor: ['rgb(0, 204, 204)', 'rgb(54, 162, 235)', 'rgb(255, 205, 86)', 'rgb(102, 204, 0)']
-                        }]
-                    },
-                    options: {
-                        responsive: false
-                    }
-                });
-                $('#contributor_canvas').click(function (ev){
-                    pie_chart_click(contributor_chart, ev);
-                });
-                
-                let contributor_risk_ctx = $('#contributor_risk_canvas')[0].getContext('2d');
-                let contributor_risk_chart = new Chart(contributor_risk_ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['High Risk', 'Medium Risk', 'Low Risk'],
-                        datasets: [{
-                            label: text,
-                            data: [10, 20, 70],
-                            backgroundColor: ['rgb(255, 0, 0)', 'rgb(255, 102, 102)', 'rgb(255, 204, 204)']
-                        }]
-                    },
-                    options: {
-                        responsive: false
-                    }
-                });
-                
-                $('#contributor_risk_canvas').click(function (ev){
-                    pie_chart_click(contributor_risk_chart, ev);
-                });
-            }
+        $('.ui.dropdown').dropdown();
+        
+        $('#apply_filters_button').click(function (){
+            let text = $('.ui.dropdown').dropdown('get text');
+            
+            $('#contributor_canvas').remove();
+            $('#contributor_risk_canvas').remove();
+            
+            $('#canvases_div').append('<canvas id="contributor_canvas" width="500" height="500" style="width: 470px; height: 470px;"></canvas>');
+            $('#canvases_div').append('<canvas id="contributor_risk_canvas" width="500" height="500" style="width: 470px; height: 470px;"></canvas>');
+            
+            let contributor_ctx = $('#contributor_canvas')[0].getContext('2d');
+            let contributor_chart = new Chart(contributor_ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['New Work', 'Refactoring', 'Helping Others', 'Code Churn'],
+                    datasets: [{
+                        label: text,
+                        data: [41, 9, 17, 33],
+                        backgroundColor: ['rgb(0, 204, 204)', 'rgb(54, 162, 235)', 'rgb(255, 205, 86)', 'rgb(102, 204, 0)']
+                    }]
+                },
+                options: {
+                    responsive: false
+                }
+            });
+            $('#contributor_canvas').click(function (ev){
+                pie_chart_click(contributor_chart, ev);
+            });
+            
+            let contributor_risk_ctx = $('#contributor_risk_canvas')[0].getContext('2d');
+            let contributor_risk_chart = new Chart(contributor_risk_ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['High Risk', 'Medium Risk', 'Low Risk'],
+                    datasets: [{
+                        label: text,
+                        data: [10, 20, 70],
+                        backgroundColor: ['rgb(255, 0, 0)', 'rgb(255, 102, 102)', 'rgb(255, 204, 204)']
+                    }]
+                },
+                options: {
+                    responsive: false
+                }
+            });
+            
+            $('#contributor_risk_canvas').click(function (ev){
+                pie_chart_click(contributor_risk_chart, ev);
+            });
         });
     }
     
