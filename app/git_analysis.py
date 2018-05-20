@@ -1,6 +1,7 @@
 from subprocess import check_output, CalledProcessError
 import re
 from datetime import datetime, timedelta
+from . import code_analysis
 
 
 def show_author_of_line(file, line_off, line, prev_sha, gitdir):
@@ -275,9 +276,7 @@ def get_commit_info(sha, gitdir):
     except ZeroDivisionError:
         c_type = 'New Work'
 
-    get_files = 'git --git-dir={gitdir} diff {sha}^ {sha} --name-only' \
-        .format(gitdir=gitdir, sha=sha).split()
-    files = check_output(get_files).decode('utf-8').split('\n')[:-1]
+    files = get_changes_for_all_files(sha, gitdir)
 
     return c_type, files
 

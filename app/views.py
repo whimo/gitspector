@@ -66,6 +66,7 @@ def new_repo():
     elif 'Cloning into' in output:
         return jsonify({'status': 'ok'})
 
+    print(output)
     return jsonify({'status': 'error', 'error_text': 'Something went wrong. Please try again later.'})
 
 
