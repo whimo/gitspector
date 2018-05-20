@@ -93,3 +93,10 @@ def stats_for_commit(sha1):
         offset += 1
 
     return diffs
+
+
+def get_commits_period(from_date, to_date):
+    cmd = f'git rev-list\
+            --since="{from_date.strftime('%Y-%m-%d')}" --before="{to_date.strftime('%Y-%m-%d')}"\
+            --all --no-merges'.split(' ')
+    return check_output(cmd).decode('utf-8').split()
