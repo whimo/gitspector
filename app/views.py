@@ -108,6 +108,8 @@ def get_stats(repo_name):
                     for commit in commits]
 
     commit_types, commit_risks = zip(*commits_info)
+    commit_types = list(commit_types)
+    commit_risks = list(commit_risks)
     min_risk, max_risk = min(commit_risks), max(commit_risks)
 
     for i, val in enumerate(commit_risks):

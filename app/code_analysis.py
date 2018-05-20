@@ -92,4 +92,4 @@ def get_risk(directory, commit, files):
         file_deps.append(max(1, dependers) * file[1])
 
     os.system('git --git-dir={}/.git checkout master'.format(directory))
-    return sum(file_deps) * files * 0.1
+    return sum(file_deps) * len(files) * 0.1
