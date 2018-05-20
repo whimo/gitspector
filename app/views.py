@@ -78,8 +78,8 @@ def get_stats(repo_name):
                         'error_text': 'You must specify a username to collect statistics.'})
 
     try:
-        from_date = datetime.strptime(request.args.get('from_date'), '%Y-%m-%d')
-        to_date =   datetime.strptime(request.args.get('to_date'),   '%Y-%m-%d')
+        from_date = datetime.strptime(request.json['from_date'], '%Y-%m-%d')
+        to_date =   datetime.strptime(request.json['to_date'],   '%Y-%m-%d')
 
     except KeyError:
         return jsonify({'status': 'error',
