@@ -40,6 +40,7 @@ $(document).ready(function() {
         $('#modal_div').append(html);
         $('.ui.modal').modal({
             onApprove: function() {
+                $('.ui.modal').modal('hide');
                 $('.ui.modal').remove();
                 return true;
             }
