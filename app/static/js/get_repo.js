@@ -136,7 +136,7 @@ $(document).ready(function() {
                 }
             });
             $('#contributor_canvas').click(function (ev){
-                pie_chart_click(contributor_chart, ev);
+                pie_chart_click(contributor_chart, ev, data);
             });
             
             let contributor_risk_ctx = $('#contributor_risk_canvas')[0].getContext('2d');
