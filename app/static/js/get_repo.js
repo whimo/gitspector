@@ -23,12 +23,16 @@ $(document).ready(function() {
         message.fadeIn().appendTo('#message_div');
     }
     
-    function pie_chart_click(chart, ev) {
+    function pie_chart_click(chart, ev, data) {
         let active_points = chart.getElementsAtEvent(ev);
         if (active_points.length > 0) {
             let clicked_index = active_points[0]['_index'];
             let label = chart.data.labels[clicked_index];
-            show_modal('New Work', {'New Work': [{hash: '080b288', desc: 'Repo contributions list'}, {hash: '624f480', desc: 'A couple of helper functions '}]});
+            
+            if (data['commits_by_type'][label])
+                show_modal(label, data['commits_by_type']);
+            else if (data['commits_by_risk'][label])
+                show_modal(label, data['commits_by_risk']);
         }
     }
     
@@ -155,7 +159,7 @@ $(document).ready(function() {
             });
             
             $('#contributor_risk_canvas').click(function (ev){
-                pie_chart_click(contributor_risk_chart, ev);
+                pie_chart_click(contributor_risk_chart, ev, data);
             });
         }).fail(function (jqXHR, status, errorThrown) {
             handleError(status);
