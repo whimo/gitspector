@@ -22,7 +22,7 @@ def _translate_interval(num, min1, max1, min2, max2):
     len1 = max1 - min1
     len2 = max2 - min2
 
-    scaled = float(num - min1) / float(len1)
+    scaled = float(num - min1) / max(float(len1), 1)
     return min2 + (scaled * len2)
 
 
