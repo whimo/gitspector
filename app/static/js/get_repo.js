@@ -43,7 +43,7 @@ $(document).ready(function() {
                     Commits for `, key, `
                 </div>
                 <div class="scrolling content">
-                    <p style="white-space: pre;">`, commits_dict[key].map(function (current) {return current['hash'] + '\t' + current['desc'];}).join('\n'), `</p>
+                    <p style="white-space: pre;">`, commits_dict[key].map(function (current) {return current['sha'] + '\t' + current['description'];}).join('\n'), `</p>
                 </div>
                 <div class="actions">
                     <div class="ui ok button">OK</div>
