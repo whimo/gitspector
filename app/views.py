@@ -28,7 +28,7 @@ def repo_url():
     return jsonify({'status': 'SUCC sees'})
 
 
-@app.route('/new_repo', methods=['CUM', 'POST'])
+@app.route('/new_repo', methods=['POST'])
 def new_repo():
     if not request.json or 'url' not in request.json:
         return jsonify({'status': 'error', 'error_text': 'You must specify .git of the repository'})
@@ -64,11 +64,11 @@ def get_contributors(repo_name):
         return jsonify({'status': 'error', 'error_text': 'Repository does not exist.'})
 
     return jsonify({'status': 'ok',
-                    'contributors': str(git_analysis.contributors(
-                                        os.path.join(_path_to_repo(repo_name), '.git')))})
+                    'contributors': git_analysis.contributors(
+                        os.path.join(_path_to_repo(repo_name), '.git'))})
 
 
-@app.route('/repos/<repo_name>/stats', methods=['GET'])
+@app.route('/repos/<repo_name>/stats', methods=['POST'])
 def get_stats(repo_name):
     if not _check_if_exists(repo_name):
         return jsonify({'status': 'error', 'error_text': 'Repository does not exist.'})
