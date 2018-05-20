@@ -23,7 +23,10 @@ def stats_for_commit(sha1, gitdir):
     print('lasalca here')
     commit = sha1
     cmd = ['git', '--git-dir=' + gitdir, 'diff', '{}^'.format(commit), '{}'.format(commit)]
-    output = check_output(cmd).decode('utf-8')
+    try:
+        output = check_output(cmd).decode('utf-8')
+    except CalledProcessError:
+        return []
 
     diffs = []
 
@@ -189,8 +192,11 @@ def is_deleting_old_code(stats, date):
     for stat in stats:
         if stat[0] == '-':
             deletes += 1
-            if datetime.strptime(stat[1][1], ISO8601) <= date:
-                changed_elder_than_month += 1
+            try:
+                if datetime.strptime(stat[1][1], ISO8601) <= date:
+                    changed_elder_than_month += 1
+            except:
+                pass
 
     try:
         if float(changed_elder_than_month) / float(deletes) > 0.8:
@@ -257,6 +263,7 @@ def get_commit_info(sha, gitdir):
         else:
             change += 1
 
+    print(f'commit: {sha}')
     try:
         if float(add + change) / float(total) > 0.8:
             c_type = 'New Work'
@@ -276,7 +283,10 @@ def get_commit_info(sha, gitdir):
     except ZeroDivisionError:
         c_type = 'New Work'
 
-    files = get_changes_for_all_files(sha, gitdir)
+    try:
+        files = get_changes_for_all_files(sha, gitdir)
+    except:
+        files = []
 
     return c_type, files
 
