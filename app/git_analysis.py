@@ -3,8 +3,8 @@ import re
 from datetime import datetime, timedelta
 
 
-def show_author_of_line(file, line_off, line, prev_sha):
-    cmd = ['git', 'blame', '{}^'.format(prev_sha), '{}'.format(file),
+def show_author_of_line(file, line_off, line, prev_sha, gitdir):
+    cmd = ['git', '--git-dir=' + gitdir, 'blame', '{}^'.format(prev_sha), '{}'.format(file),
            '-L{},{}'.format(line_off + line, line_off + line)]
 
     try:
@@ -18,10 +18,10 @@ def show_author_of_line(file, line_off, line, prev_sha):
         return (None, None)
 
 
-def stats_for_commit(sha1):
+def stats_for_commit(sha1, gitdir):
     print('lasalca here')
     commit = sha1
-    cmd = ['git', 'diff', '{}^'.format(commit), '{}'.format(commit)]
+    cmd = ['git', '--git-dir=' + gitdir, 'diff', '{}^'.format(commit), '{}'.format(commit)]
     output = check_output(cmd).decode('utf-8')
 
     diffs = []
@@ -46,7 +46,10 @@ def stats_for_commit(sha1):
                 continue
             else:
                 r_skip = r'\@\@ [\-\+][0-9]*,[0-9]* [\-\+][0-9]*,([0-9]*) \@\@'
-                skip_new_file_idx = int(re.search(r_skip, line).group(1))
+                try:
+                    skip_new_file_idx = int(re.search(r_skip, line).group(1))
+                except AttributeError:
+                    skip_new_file_idx = 1
                 skip_new_file_iter = 0
                 continue
 
@@ -98,7 +101,8 @@ def stats_for_commit(sha1):
             diffs.append(('-', show_author_of_line(filename,
                                                    offset + del_off,
                                                    line_a,
-                                                   '{}'.format(commit))))
+                                                   '{}'.format(commit),
+                                                   gitdir)))
             del_off -= 1
 
         offset += 1
@@ -106,17 +110,24 @@ def stats_for_commit(sha1):
     return diffs
 
 
-def changes_in_files_in_commit(commit):
-    cmd = 'git diff {sha}^ {sha} --stat'.format(sha=commit)
-    stats = check_output(cmd.split())
-    for line in stats.split('\n')[:-1]:
-        r_stat = r'([^\0]*) | ([0-9]+) [\-\+]*'
+def changes_in_files_in_commit(commit, gitdir):
+    cmd = 'git --git-dir={gitdir} diff {sha}^ {sha} --stat' \
+        .format(gitdir=gitdir, sha=commit)
+
+    stats = check_output(cmd.split()).decode('utf-8')
+    r_stat = r' (.+?) +\| +([0-9]+) [\-\+]*\n'
+
+    for line in stats.split('\n')[:-2]:
+        line += '\n'
+        print(repr(line))
         stat = re.search(r_stat, line)
-        yield (stat.group(1), stat.group(2))
+        yield (stat.group(1), int(stat.group(2)))
 
 
-def get_commits_period(from_date, to_date):
-    cmd = ['git', 'rev-list',
+def get_commits_period(from_date, to_date, gitdir):
+    cmd = ['git',
+           '--git-dir=' + gitdir,
+           'rev-list',
            '--since="{}"'.format(from_date.strftime('%Y-%m-%d')),
            '--before="{}"'.format(to_date.strftime('%Y-%m-%d')),
            '--all', '--no-merges']
@@ -127,13 +138,17 @@ def get_commits_period(from_date, to_date):
 ISO8601 = '%Y-%m-%d %H:%M:%S %z'
 
 
-def get_description(sha):
-    cmd = f'git log --format=%B -n 1 {sha}'
+def get_description(sha, gitdir):
+    cmd = 'git --git-dir={gitdir} log --format=%B -n 1 {sha}' \
+        .format(gitdir=gitdir, sha=sha)
+
     return check_output(cmd.split()).decode('utf-8')
 
 
-def get_diff_count(sha):
-    cmd = f'git diff {sha}^ {sha} --stat'.split()
+def get_diff_count(sha, gitdir):
+    cmd = 'git --git-dir={gitdir} diff {sha}^ {sha} --stat' \
+        .format(gitdir=gitdir, sha=sha).split()
+
     stat = check_output(cmd).decode('utf-8').split('\n')[:-2]
 
     r_change = r'.* (|) *([0-9]+).*'
@@ -144,8 +159,9 @@ def get_diff_count(sha):
     return changes
 
 
-def get_changes_for_all_files(sha):
-    cmd = 'git diff {sha}^ {sha} --stat'.format(sha=sha).split()
+def get_changes_for_all_files(sha, gitdir):
+    cmd = 'git --git-dir={gitdir} diff {sha}^ {sha} --stat' \
+        .format(gitdir=gitdir, sha=sha).split()
     stat = check_output(cmd).decode('utf-8').split('\n')[:-2]
 
     r_change = r' (.+?) +\| +([0-9]+) [\-\+]*\n'
@@ -154,13 +170,14 @@ def get_changes_for_all_files(sha):
     for line in stat:
         line += '\n'
         match = re.search(r_change, line)
-        files.append((match.group(1), match.group(2)))
+        files.append((match.group(1), int(match.group(2))))
 
     return files
 
 
-def get_time(sha):
-    cmd = f'git log --format=%ai -n 1 {sha}'.split()
+def get_time(sha, gitdir):
+    cmd = 'git --git-dir={gitdir} log --format=%ai -n 1 {sha}' \
+        .format(gitdir=gitdir, sha=sha).split()
     return check_output(cmd).decode('utf-8').replace('\n', '')
 
 
@@ -174,7 +191,10 @@ def is_deleting_old_code(stats, date):
             if datetime.strptime(stat[1][1], ISO8601) <= date:
                 changed_elder_than_month += 1
 
-    if float(changed_elder_than_month) / float(deletes) > 0.8:
+    try:
+        if float(changed_elder_than_month) / float(deletes) > 0.8:
+            return True
+    except ZeroDivisionError:
         return True
 
     return False
@@ -189,7 +209,10 @@ def is_helping_others(stats, me):
             if stat[1][0] != me:
                 helps += 1
 
-    if float(helps) / float(deletes) > 0.8:
+    try:
+        if float(helps) / float(deletes) > 0.8:
+            return True
+    except ZeroDivisionError:
         return True
 
     return False
@@ -206,17 +229,20 @@ def is_churning(stats, date, me):
                 if stat[1][0] == me:
                     changed_newer_than_week += 1
 
-    if float(changed_newer_than_week) / float(deletes) > 0.8:
+    try:
+        if float(changed_newer_than_week) / float(deletes) > 0.8:
+            return True
+    except ZeroDivisionError:
         return True
 
     return False
 
 
-def get_commit_info(sha):
-    cmd = ['git', 'log', '--format=%an', '-n', '1', sha]
+def get_commit_info(sha, gitdir):
+    cmd = ['git', '--git-dir=' + gitdir, 'log', '--format=%an', '-n', '1', sha]
     me = check_output(cmd).decode('utf-8').replace('\n', '')
 
-    commit_stats = stats_for_commit(sha)
+    commit_stats = stats_for_commit(sha, gitdir)
 
     minus = 0
     add = 0
@@ -230,36 +256,42 @@ def get_commit_info(sha):
         else:
             change += 1
 
-    if float(add + change) / float(total) > 0.8:
+    try:
+        if float(add + change) / float(total) > 0.8:
+            c_type = 'New Work'
+
+        elif is_deleting_old_code(commit_stats, get_time(sha, gitdir)):
+            c_type = 'Refactoring'
+
+        elif is_helping_others(commit_stats, me):
+            c_type = 'Helping Others'
+
+        elif is_churning(commit_stats, get_time(sha, gitdir), me):
+            c_type = 'Code Churn'
+
+        else:
+            c_type = 'Other'
+
+    except ZeroDivisionError:
         c_type = 'New Work'
 
-    elif is_deleting_old_code(commit_stats, get_time(sha)):
-        c_type = 'Refactoring'
-
-    elif is_helping_others(commit_stats, me):
-        c_type = 'Helping Others'
-
-    elif is_churning(commit_stats, get_time(sha), me):
-        c_type = 'Code Churn'
-
-    else:
-        c_type = 'Other'
-
-    get_files = f'git diff {sha}^ {sha} --name-only'.split()
+    get_files = 'git --git-dir={gitdir} diff {sha}^ {sha} --name-only' \
+        .format(gitdir=gitdir, sha=sha).split()
     files = check_output(get_files).decode('utf-8').split('\n')[:-1]
 
     return c_type, files
 
 
-def get_counts_period(from_date, to_date):
-    commits = get_commits_period(from_date, to_date)
+def get_counts_period(from_date, to_date, gitdir):
+    commits = get_commits_period(from_date, to_date, gitdir)
     activity = {'New Work': 0,
                 'Refactoring': 0,
                 'Helping Others': 0,
-                'Code Churn': 0}
+                'Code Churn': 0,
+                'Other': 0}
     for commit in commits:
-        c_type, _ = get_commit_info(commit)
-        amount = get_diff_count(commit)
+        c_type, _ = get_commit_info(commit, gitdir)
+        amount = get_diff_count(commit, gitdir)
         activity[c_type] += amount
 
     return activity
