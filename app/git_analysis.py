@@ -140,9 +140,23 @@ def get_diff_count(sha):
     changes = 0
 
     for line in stat:
-        print(repr(line))
         changes += int(re.search(r_change, line).group(2))
     return changes
+
+
+def get_changes_for_all_files(sha):
+    cmd = 'git diff {sha}^ {sha} --stat'.format(sha=sha).split()
+    stat = check_output(cmd).decode('utf-8').split('\n')[:-2]
+
+    r_change = r' (.+?) +\| +([0-9]+) [\-\+]*\n'
+    files = []
+
+    for line in stat:
+        line += '\n'
+        match = re.search(r_change, line)
+        files.append((match.group(1), match.group(2)))
+
+    return files
 
 
 def get_time(sha):
