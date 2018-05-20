@@ -76,7 +76,6 @@ def stats_for_commit(sha1):
             continue
 
         if line.startswith('diff'):
-            files_in_commit += 1
             stage = 1
             continue
 
@@ -112,3 +111,14 @@ def get_commits_period(from_date, to_date):
            '--all', '--no-merges']
 
     return check_output(cmd).decode('utf-8').split()
+
+
+def contributors(directory):
+    cmd = ['git', '--git-dir={}'.format(directory), 'shortlog', '-sn']
+    output = check_output(cmd).decode('utf-8')
+
+    contributors_list = []
+    for line in output.split('\n'):
+        contributors.append(' '.join(line.split()[1:]))
+
+    return contributors_list
