@@ -7,7 +7,7 @@ from collections import defaultdict
 from . import git_analysis
 
 
-def _path_to_repo(repo_name, include_git=True):
+def _path_to_repo(repo_name, include_git=False):
     if include_git:
         return os.path.join(app.config['REPOS_DIR'], repo_name, '.git')
     else:
@@ -48,7 +48,7 @@ def new_repo():
     repo_name = repo_url.split('/')[-1][:-4]
     repo_name.replace('..', 'DEADBEEF')
 
-    os.system('rm -rf {}'.format(_path_to_repo(repo_name)))
+    os.system('rm -rf {}'.format(_path_to_repo(repo_name, False)))
 
     try:
         output = check_output(['git', 'clone', repo_url, _path_to_repo(repo_name, False)],
